@@ -33,9 +33,6 @@ void timestamp ( );
 
 int main ( int argc, char *argv[] )
 {
-  // Long Double - Extended precision
-  if(main_md< long double >(argc, argv, "long double") != 0)
-    return 1;
   // Double - FP64
   if(main_md< double >(argc, argv, "double") != 0)
     return 1;
@@ -365,7 +362,7 @@ void compute ( int np, int nd, Real pos[], Real vel[],
 //         {
 //           pe = pe + 0.5 * pow ( sin ( d2 ), 2 );
 //         }
-        pe_v[j+k*np] = 0.5 * pow ( sin ( d2 ), 2 );
+        pe_v[j+k*np] = 0.5 * ( sin ( d2 )*sin ( d2 ) );
 
         for ( i = 0; i < nd; i++ )
         {

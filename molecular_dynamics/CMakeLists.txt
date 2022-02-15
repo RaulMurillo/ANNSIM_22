@@ -3,6 +3,7 @@ project("molecular_dynamics")
 # file (GLOB SOURCES "src/*.cpp")
 # find_package(UNIVERSAL CONFIG REQUIRED)
 # Include universal (posits) ##############################################
+include_directories("/homelocal/raul_local/Documents/libs/universal/include")
 include_directories("~/universal-3.48/include")
 
 

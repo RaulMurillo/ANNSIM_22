@@ -1,6 +1,6 @@
 import numpy as np
 
-LOGDIR = 'build/'
+LOGDIR = './results/'
 Ls = 1024
 Fs = 2000
 

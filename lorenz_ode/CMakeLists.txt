@@ -4,8 +4,6 @@ project("lorenz_ode")
 # find_package(UNIVERSAL CONFIG REQUIRED)
 # Include universal (posits) ##############################################
 include_directories("/homelocal/raul_local/Documents/libs/universal/include")
-include_directories("~/universal-3.48/include")
-
 
 add_executable(${PROJECT_NAME} src/lorenz_ode.cpp)
 # target_link_libraries(${PROJECT_NAME} UNIVERSAL::UNIVERSAL)

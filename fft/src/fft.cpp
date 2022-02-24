@@ -51,6 +51,16 @@ int main ( void )
 //****************************************************************************80
 
 template<typename Real>
+void print_complexArray ( Real arr, int n )
+{
+  for (int i = 0; i< 2*n; i+=2){
+    cout << arr[i] << ", " << arr[i+1] << endl;
+  }
+}
+
+//****************************************************************************80
+
+template<typename Real>
 int main_fft ( string dtype )
 
 //****************************************************************************80
@@ -204,6 +214,7 @@ int main_fft ( string dtype )
         {
           double tmp_1 = (z[i]   - fnm1 * (double)x[i]);
           double tmp_2 = (z[i+1] - fnm1 * (double)x[i+1]);
+          cout << tmp_1 << ", " << tmp_2 << endl;
           error = error 
           // + pow ( z[i]   - fnm1 * x[i], 2 )
           // + pow ( z[i+1] - fnm1 * x[i+1], 2 );
@@ -247,6 +258,8 @@ int main_fft ( string dtype )
     {
       nits = 1;
     }
+    // print_complexArray(x, n);
+    
     delete [] w;
     delete [] x;
     delete [] y;

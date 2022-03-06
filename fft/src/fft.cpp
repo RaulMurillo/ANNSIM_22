@@ -19,8 +19,7 @@ template<typename Real>
 void cfft2 ( int n, Real x[], Real y[], Real w[], double sgn );
 template<typename Real>
 void cffti ( int n, Real w[] );
-template<typename Real>
-Real ggl ( double *ds );
+double ggl ( double *ds );
 template<typename Real>
 void step ( int n, int mj, Real a[], Real b[], Real c[], Real d[], 
   Real w[], double sgn );
@@ -30,7 +29,6 @@ void timestamp ( );
 
 int main ( void )
 {
-  main_fft<double>("double");
   // Double - FP64
   if(main_fft< double >("double") != 0)
     return 1;
@@ -48,6 +46,16 @@ int main ( void )
     return 1;
 
   return 0;
+}
+
+//****************************************************************************80
+
+template<typename Real>
+void print_complexArray ( Real arr, int n )
+{
+  for (int i = 0; i< 2*n; i+=2){
+    cout << arr[i] << ", " << arr[i+1] << endl;
+  }
 }
 
 //****************************************************************************80
@@ -92,7 +100,7 @@ int main_fft ( string dtype )
   int icase;
   int it;
   int ln2;
-  int ln2_max = 20;//25;
+  int ln2_max = 10;//25;
   double mflops;
   int n;
   int nits = 10000;
@@ -102,9 +110,9 @@ int main_fft ( string dtype )
   double wtime;
   Real *x;
   Real *y;
-  Real *z;
-  Real z0;
-  Real z1;
+  double *z;
+  double z0;
+  double z1;
 
   timestamp ( );
   cout << "\n";
@@ -145,10 +153,10 @@ int main_fft ( string dtype )
 //  and store a complex number as a pair of doubles, a complex vector as a doubly
 //  dimensioned array whose second dimension is 2. 
 //
-    w = new Real[  n];
-    x = new Real[2*n];
-    y = new Real[2*n];
-    z = new Real[2*n];
+    w = new   Real[  n];
+    x = new   Real[2*n];
+    y = new   Real[2*n];
+    z = new double[2*n];
 
     first = 1;
 
@@ -159,8 +167,8 @@ int main_fft ( string dtype )
       {
         for ( i = 0; i < 2 * n; i = i + 2 )
         {
-          z0 = ggl<Real> ( &seed );
-          z1 = ggl<Real> ( &seed );
+          z0 = ggl ( &seed );
+          z1 = ggl ( &seed );
           x[i] = z0;
           z[i] = z0;
           x[i+1] = z1;
@@ -204,8 +212,9 @@ int main_fft ( string dtype )
         error = 0.0;
         for ( i = 0; i < 2 * n; i = i + 2 )
         {
-          double tmp_1 = (double)(z[i]   - fnm1 * x[i]);
-          double tmp_2 = (double)(z[i+1] - fnm1 * x[i+1]);
+          double tmp_1 = (z[i]   - fnm1 * (double)x[i]);
+          double tmp_2 = (z[i+1] - fnm1 * (double)x[i+1]);
+          cout << tmp_1 << ", " << tmp_2 << endl;
           error = error 
           // + pow ( z[i]   - fnm1 * x[i], 2 )
           // + pow ( z[i+1] - fnm1 * x[i+1], 2 );
@@ -249,6 +258,8 @@ int main_fft ( string dtype )
     {
       nits = 1;
     }
+    // print_complexArray(x, n);
+    
     delete [] w;
     delete [] x;
     delete [] y;
@@ -460,15 +471,14 @@ void cffti ( int n, Real w[] )
   for ( i = 0; i < n2; i++ )
   {
     arg = aw * ( ( double ) i );
-    w[i*2+0] = cos ( arg );
-    w[i*2+1] = sin ( arg );
+    w[i*2+0] = ( Real )(cos ( arg ));
+    w[i*2+1] = ( Real )(sin ( arg ));
   }
   return;
 }
 //****************************************************************************80
 
-template<typename Real>
-Real ggl ( double *seed )
+double ggl ( double *seed )
 
 //****************************************************************************80
 //
@@ -502,12 +512,12 @@ Real ggl ( double *seed )
 {
   double d2 = 0.2147483647e10;
   double t;
-  Real value;
+  double value;
 
   t = ( double ) *seed;
   t = fmod ( 16807.0 * t, d2 );
   *seed = ( double ) t;
-  value = ( Real ) ( ( t - 1.0 ) / ( d2 - 1.0 ) );
+  value = ( ( t - 1.0 ) / ( d2 - 1.0 ) );
 
   return value;
 }

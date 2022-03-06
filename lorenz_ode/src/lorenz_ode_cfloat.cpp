@@ -5,7 +5,7 @@
 # include <cmath>
 # include <ctime>
 
-#include <universal/number/posit/posit.hpp>
+#include <universal/number/cfloat/cfloat.hpp>
 
 using namespace std;
 using namespace sw::universal;
@@ -26,38 +26,17 @@ void timestamp ( );
 
 int main ()
 {
-  // Double - FP64
-  if(main_lorenz< double >("double") != 0)
+  // // Double - FP64
+  // if(main_lorenz< double >("double") != 0)
+  //   return 1;
+  // // Float - FP32
+  // if(main_lorenz< float >("float") != 0)
+  //   return 1;
+  // Float - FP16
+  if(main_lorenz< cfloat<16,5> >("float16") != 0)
     return 1;
-  // Float - FP32
-  if(main_lorenz< float >("float") != 0)
-    return 1;
-  // Posit<32,2>
-  if(main_lorenz< posit<32,2> >("posit_32_2") != 0)
-    return 1;
-  // Posit<28,2>
-  if(main_lorenz< posit<28,2> >("posit_28_2") != 0)
-    return 1;
-  // Posit<24,2>
-  if(main_lorenz< posit<24,2> >("posit_24_2") != 0)
-    return 1;
-  // Posit<20,2>
-  if(main_lorenz< posit<20,2> >("posit_20_2") != 0)
-    return 1;
-  // Posit<16,2>
-  if(main_lorenz< posit<16,2> >("posit_16_2") != 0)
-    return 1;
-  // Posit<14,2>
-  if(main_lorenz< posit<14,2> >("posit_14_2") != 0)
-    return 1;
-  // Posit<12,2>
-  if(main_lorenz< posit<12,2> >("posit_12_2") != 0)
-    return 1;
-  // Posit<10,2>
-  if(main_lorenz< posit<10,2> >("posit_10_2") != 0)
-    return 1;
-  // Posit<8,2>
-  if(main_lorenz< posit<8,2> >("posit_8_2") != 0)
+  // BFloat - BFP16
+  if(main_lorenz< cfloat<16,8> >("bfloat") != 0)
     return 1;
 
   return 0;
@@ -118,7 +97,7 @@ int main_lorenz ( string dtype )
 //  Data
 //
   t_final = 40.0;
-  dt = t_final / n ;
+  dt = 40.0 / n;
   // std::cout << "SOME DATA " << t_final << " - " << dt << std::endl;
 //
 //  Store the initial conditions in entry 0.
@@ -137,7 +116,9 @@ int main_lorenz ( string dtype )
     for ( i = 0; i < m; i++ )
     {
       x[i+(j+1)*m] = xnew[i];
+      // std::cout << xnew[i] << ", ";
     }
+    // std::cout << std::endl;
     delete [] xnew; 
   }
 //
@@ -377,19 +358,23 @@ Real *rk4vec ( Real t0, int m, Real u0[], Real dt,
 //
   f0 = f ( t0, m, u0 );
 
-  t1 = t0 + dt / 2.0;
+  // t1 = t0 + dt / 2.0;
+  t1 = t0 + dt * (Real)(0.5);
   u1 = new Real[m];
   for ( i = 0; i < m; i++ )
   {
-    u1[i] = u0[i] + dt * f0[i] / 2.0;
+    // u1[i] = u0[i] + dt * f0[i] / 2.0;
+    u1[i] = u0[i] + dt * f0[i] * (Real)(0.5);
   }
   f1 = f ( t1, m, u1 );
 
-  t2 = t0 + dt / 2.0;
+  // t2 = t0 + dt / 2.0;
+  t2 = t0 + dt * (Real)(0.5);
   u2 = new Real[m];
   for ( i = 0; i < m; i++ )
   {
-    u2[i] = u0[i] + dt * f1[i] / 2.0;
+    // u2[i] = u0[i] + dt * f1[i] / 2.0;
+    u2[i] = u0[i] + dt * f1[i] * (Real)(0.5);
   }
   f2 = f ( t2, m, u2 );
 
@@ -406,7 +391,8 @@ Real *rk4vec ( Real t0, int m, Real u0[], Real dt,
   u = new Real[m];
   for ( i = 0; i < m; i++ )
   {
-     u[i] = u0[i] + dt * ( f0[i] + 2.0 * f1[i] + 2.0 * f2[i] + f3[i] ) / 6.0;
+    //  u[i] = u0[i] + dt * ( f0[i] + 2.0 * f1[i] + 2.0 * f2[i] + f3[i] ) / 6.0;
+     u[i] = u0[i] + dt * ( f0[i] + (Real)(2.0) * f1[i] + (Real)(2.0) * f2[i] + f3[i] ) * (Real)(0.166666666666666);
   }
 //
 //  Free memory.

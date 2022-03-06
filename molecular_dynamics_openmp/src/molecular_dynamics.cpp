@@ -39,9 +39,12 @@ int main ( int argc, char *argv[] )
   // Float - FP32
   if(main_md< float >(argc, argv, "float") != 0)
     return 1;
-  // // Posit<16,2>
-  // if(main_md< posit<16,2> >(argc, argv, "posit<16,2>") != 0)
-  //   return 1;
+  // Posit<32,2>
+  if(main_md< posit<32,2> >(argc, argv, "posit<32,2>") != 0)
+    return 1;
+  // Posit<16,2>
+  if(main_md< posit<16,2> >(argc, argv, "posit<16,2>") != 0)
+    return 1;
 
   return 0;
 }
@@ -359,7 +362,7 @@ void compute ( int np, int nd, Real pos[], Real vel[],
 //         {
 //           pe = pe + 0.5 * pow ( sin ( d2 ), 2 );
 //         }
-        pe_v[j+k*np] = 0.5 * pow ( sin ( d2 ), 2 );
+        pe_v[j+k*np] = 0.5 * ( sin ( d2 )*sin ( d2 ) );
 
         for ( i = 0; i < nd; i++ )
         {
@@ -587,7 +590,7 @@ Real r8_uniform_01 ( int *seed )
     *seed = *seed + 2147483647;
   }
 
-  r = ( Real ) ( *seed ) * 4.656612875E-10;
+  r = ( Real ) (( *seed ) * 4.656612875E-10);
 
   return r;
 }

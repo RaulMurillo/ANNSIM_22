@@ -6,6 +6,7 @@
 # include <ctime>
 
 #include <universal/number/posit/posit.hpp>
+#include <universal/number/cfloat/cfloat.hpp>
 
 using namespace std;
 using namespace sw::universal;
@@ -14,23 +15,32 @@ int main ( );
 template<typename Real>
 int main_lorenz ( string dtype );
 template<typename Real>
-Real *lorenz_rhs ( Real t, int m, Real x[] );
+Real *lorenz_rhs ( int m, Real x[] );
+double *r8vec_linspace_new ( int n, double a, double b );
 template<typename Real>
-Real *r8vec_linspace_new ( int n, double a, double b );
-template<typename Real>
-Real *rk4vec ( Real t0, int n, Real u0[], Real dt, 
-  Real *f ( Real t, int n, Real u[] ) );
+Real *rk4vec ( double t0, int n, Real u0[], double dt, 
+  Real *f ( int n, Real u[] ) );
 void timestamp ( );
 
 //****************************************************************************80
 
 int main ()
 {
+	constexpr bool hasSubnormals   = true;
+	constexpr bool hasSupernormals = false;
+	constexpr bool isSaturating    = false;
+
   // Double - FP64
   if(main_lorenz< double >("double") != 0)
     return 1;
   // Float - FP32
   if(main_lorenz< float >("float") != 0)
+    return 1;
+  // Float - FP16
+  if(main_lorenz< cfloat<16, 5, uint8_t, hasSubnormals, hasSupernormals, isSaturating> >("float16") != 0)
+    return 1;
+  // Float - BFloat16
+  if(main_lorenz< cfloat<16, 7, uint8_t, hasSubnormals, hasSupernormals, isSaturating> >("bfloat") != 0)
     return 1;
   // Posit<32,2>
   if(main_lorenz< posit<32,2> >("posit_32_2") != 0)
@@ -44,6 +54,9 @@ int main ()
   // Posit<20,2>
   if(main_lorenz< posit<20,2> >("posit_20_2") != 0)
     return 1;
+  // // Posit<18,2>
+  // if(main_lorenz< posit<18,2> >("posit_18_2") != 0)
+  //   return 1;
   // Posit<16,2>
   if(main_lorenz< posit<16,2> >("posit_16_2") != 0)
     return 1;
@@ -97,12 +110,12 @@ int main_lorenz ( string dtype )
   string data_= "lorenz_ode_data_";
   string data_filename = data_ + dtype + extension;
   ofstream data_unit;
-  Real dt;
+  double dt;
   int i;
   int j;
   int m = 3;
   int n = 200000;
-  Real *t;
+  double *t;
   double t_final;
   Real *x;
   Real *xnew;
@@ -123,7 +136,7 @@ int main_lorenz ( string dtype )
 //
 //  Store the initial conditions in entry 0.
 //
-  t = r8vec_linspace_new<Real> ( n + 1, 0.0, t_final );
+  t = r8vec_linspace_new ( n + 1, 0.0, t_final );
   x = new Real[m*(n+1)];
   x[0+0*m] = 8.0;
   x[0+1*m] = 1.0;
@@ -199,7 +212,7 @@ int main_lorenz ( string dtype )
 //****************************************************************************80
 
 template<typename Real>
-Real *lorenz_rhs ( Real t, int m, Real x[] )
+Real *lorenz_rhs ( int m, Real x[] )
 
 //****************************************************************************80
 //
@@ -247,8 +260,7 @@ Real *lorenz_rhs ( Real t, int m, Real x[] )
 }
 //****************************************************************************80
 
-template<typename Real>
-Real *r8vec_linspace_new ( int n, double a_first, double a_last )
+double *r8vec_linspace_new ( int n, double a_first, double a_last )
 
 //****************************************************************************80
 //
@@ -286,10 +298,10 @@ Real *r8vec_linspace_new ( int n, double a_first, double a_last )
 //    Output, Real R8VEC_LINSPACE_NEW[N], a vector of linearly spaced data.
 //
 {
-  Real *a;
+  double *a;
   int i;
 
-  a = new Real[n];
+  a = new double[n];
 
   if ( n == 1 )
   {
@@ -299,9 +311,9 @@ Real *r8vec_linspace_new ( int n, double a_first, double a_last )
   {
     for ( i = 0; i < n; i++ )
     {
-      a[i] = ( ( n - 1 - i ) * a_first 
-             + (         i ) * a_last ) 
-             / ( n - 1     );
+      a[i] = ( ( double ) ( n - 1 - i ) * a_first 
+             + ( double ) (         i ) * a_last ) 
+             / ( double ) ( n - 1     );
     }
   }
   return a;
@@ -309,8 +321,8 @@ Real *r8vec_linspace_new ( int n, double a_first, double a_last )
 //****************************************************************************80
 
 template<typename Real>
-Real *rk4vec ( Real t0, int m, Real u0[], Real dt, 
-  Real *f ( Real t, int m, Real u[] ) )
+Real *rk4vec ( double t0, int m, Real u0[], double dt, 
+  Real *f ( int m, Real u[] ) )
 
 //****************************************************************************80
 //
@@ -375,31 +387,34 @@ Real *rk4vec ( Real t0, int m, Real u0[], Real dt,
 //
 //  Get four sample values of the derivative.
 //
-  f0 = f ( t0, m, u0 );
+  f0 = f ( m, u0 );
 
   t1 = t0 + dt / 2.0;
   u1 = new Real[m];
   for ( i = 0; i < m; i++ )
   {
     u1[i] = u0[i] + dt * f0[i] / 2.0;
+    // u1[i] = u0[i] + (Real)(dt) * f0[i] * (Real)(0.5);
   }
-  f1 = f ( t1, m, u1 );
+  f1 = f ( m, u1 );
 
   t2 = t0 + dt / 2.0;
   u2 = new Real[m];
   for ( i = 0; i < m; i++ )
   {
     u2[i] = u0[i] + dt * f1[i] / 2.0;
+    // u2[i] = u0[i] + (Real)(dt) * f1[i] * (Real)(0.5);
   }
-  f2 = f ( t2, m, u2 );
+  f2 = f ( m, u2 );
 
   t3 = t0 + dt;
   u3 = new Real[m];
   for ( i = 0; i < m; i++ )
   {
      u3[i] = u0[i] + dt * f2[i];
+    //  u3[i] = u0[i] + (Real)(dt) * f2[i];
   }
-  f3 = f ( t3, m, u3 );
+  f3 = f ( m, u3 );
 //
 //  Combine them to estimate the solution.
 //
@@ -407,6 +422,7 @@ Real *rk4vec ( Real t0, int m, Real u0[], Real dt,
   for ( i = 0; i < m; i++ )
   {
      u[i] = u0[i] + dt * ( f0[i] + 2.0 * f1[i] + 2.0 * f2[i] + f3[i] ) / 6.0;
+    //  u[i] = u0[i] + (Real)(dt) * ( f0[i] + (Real)(2.0) * f1[i] + (Real)(2.0) * f2[i] + f3[i] ) * (Real)(0.166666666666666);
   }
 //
 //  Free memory.

@@ -11,7 +11,7 @@ done
 
 for es in 8 5
 do
-    sed -i "s/using Real.*/using Real = cfloat<16,${es}>;/g" ../src/test.cpp
+    sed -i "s/using Real.*/using Real = cfloat<16,${es},uint8_t, true, false, false>;/g" ../src/test.cpp
     make
     ./my_fft > ../results/float_16_${es}.log
 done

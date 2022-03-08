@@ -6,8 +6,8 @@ Fs = 2000
 
 d_a   = np.genfromtxt(LOGDIR+'double.log', delimiter=',')
 f_a   = np.genfromtxt(LOGDIR+'float.log', delimiter=',')
-hf_a   = np.genfromtxt(LOGDIR+'float_16_5.log', delimiter=',')
-bf_a   = np.genfromtxt(LOGDIR+'float_16_8.log', delimiter=',')
+hf_a  = np.genfromtxt(LOGDIR+'float_16_5.log', delimiter=',')
+bf_a  = np.genfromtxt(LOGDIR+'float_16_8.log', delimiter=',')
 p32_a = np.genfromtxt(LOGDIR+'posit_32.log', delimiter=',')
 p28_a = np.genfromtxt(LOGDIR+'posit_28.log', delimiter=',')
 p24_a = np.genfromtxt(LOGDIR+'posit_24.log', delimiter=',')
@@ -31,4 +31,4 @@ for i, a in enumerate([f_a, hf_a, bf_a, p32_a, p28_a, p24_a, p20_a, p16_a, p14_a
 
     error = np.mean((d_PS-a_PS)**2)
 
-    print(f'{format[i]} error: {error}')
+    print(f'{format[i]} error: {error:.2e}')

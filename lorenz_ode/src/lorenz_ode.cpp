@@ -1,3 +1,4 @@
+// https://people.math.sc.edu/Burkardt/cpp_src/lorenz_ode/lorenz_ode.html
 # include <cstdlib>
 # include <iostream>
 # include <fstream>

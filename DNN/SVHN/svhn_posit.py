@@ -81,7 +81,7 @@ bfloat16  = FloatingPoint(exp=8, man=7 )
 # # bit_28 = Posit(nsize=28, es=2)
 # # bit_32 = Posit(nsize=32, es=2)
 
-num_format = bit_8
+num_format = bfloat16
 
 # define quantization functions
 weight_quant = quantizer(forward_number=num_format,

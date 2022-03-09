@@ -18,15 +18,17 @@ int main()
 
     // https://www.educba.com/matlab-fft/
     int Ls = 1024;  // Signal length
-    int Fs = 2000;  // Sampling frequency
+    // int Fs = 2000;  // Sampling frequency
+    int Fs = 1000;  // Sampling frequency
     double Ts = 1.0/Fs;   // Sampling period
     double* tv = new double[Ls];   // Time vector
     double* f = new double[Ls];  // Input signal
     for (int i = 0; i< Ls; ++i)
     {
         tv[i] = i*Ts;
-        // Add Random Noise Signal
-        f[i] = 0.6*sin(2*PI*50*tv[i]) + 3*d(gen)+ sin(2*PI*120*tv[i]);
+        // Add Random Noise to Signal { 0.6*sin(2*PI*50*tv[i]) + sin(2*PI*120*tv[i]) }
+        // f[i] = 0.6*sin(2*PI*50*tv[i]) + sin(2*PI*120*tv[i]) + 3*d(gen);
+        f[i] = 0.7*sin(2*PI*50*tv[i]) + sin(2*PI*120*tv[i]) + 2*d(gen);
     }
     std::cout << tv[0];
     for (int i = 1; i< Ls; ++i)

@@ -19,11 +19,11 @@ https://sodocumentation.net/algorithm/topic/8683/fast-fourier-transform
 #define log10_2_INV 3.3219280948873623478703194294948 // 1/Log10(2)
 
 // complex variable structure (template)
-template <typename Real> 
+template <typename Real_t>
 struct complex
 {
 public:
-    Real  Re, Im;        // Not so complicated after all
+    Real_t  Re, Im;        // Not so complicated after all
 };
 
 // Returns true if N is a power of 2
@@ -37,8 +37,8 @@ bool isPwrTwo(int N, int *M)
     return true;
 }
 
-template <typename Real> 
-void rad2FFT(int N, complex<Real> *x, complex<Real> *DFT)
+template <typename Real_t> 
+void rad2FFT(int N, complex<Real_t> *x, complex<Real_t> *DFT)
 {
     int M = 0;
 
@@ -67,12 +67,12 @@ void rad2FFT(int N, complex<Real> *x, complex<Real> *DFT)
     double TwoPi_NP;
 
     // complex Variables (See 'struct complex')
-    complex<Real> WN;               // Wn is the exponential weighting function in the form a + jb
-    complex<Real> TEMP;             // TEMP is used to save computation in the butterfly calc
-    complex<Real> *pDFT = DFT;      // Pointer to first elements in DFT array
-    complex<Real> *pLo;             // Pointer for lo / hi value of butterfly calcs
-    complex<Real> *pHi;
-    complex<Real> *pX;              // Pointer to x[n]
+    complex<Real_t> WN;               // Wn is the exponential weighting function in the form a + jb
+    complex<Real_t> TEMP;             // TEMP is used to save computation in the butterfly calc
+    complex<Real_t> *pDFT = DFT;      // Pointer to first elements in DFT array
+    complex<Real_t> *pLo;             // Pointer for lo / hi value of butterfly calcs
+    complex<Real_t> *pHi;
+    complex<Real_t> *pX;              // Pointer to x[n]
 
 
     // Decimation In Time - x[n] sample sorting
@@ -154,6 +154,38 @@ void rad2FFT(int N, complex<Real> *x, complex<Real> *DFT)
     pDFT = 0;
     DFT = 0;
     pX = 0;
+}
+
+template <typename Real_t> 
+void rad2InverseFFT(int N, complex<Real_t> *x, complex<Real_t> *DFT)
+{
+    // M is number of stages to perform. 2^M = N
+    double Mx = (log10((double)N) / log10((double)2));
+    int a = (int)(ceil(pow(2.0, Mx)));
+    int status = 0;
+    if (a != N) // Check N is a power of 2
+    {
+        x = 0;
+        DFT = 0;
+        throw "rad2InverseFFT(): N must be a power of 2 for Radix 2 Inverse FFT";
+    }
+
+    complex<Real_t> *pDFT = DFT;        // Reset vector for DFT pointers
+    complex<Real_t> *pX = x;            // Reset vector for x[n] pointer
+    double NN = 1 / (double)N;  // Scaling factor for the inverse FFT        
+
+    for (int i = 0; i < N; i++, DFT++)
+        DFT->Im *= -1;          // Find the complex conjugate of the Frequency Spectrum
+
+    DFT = pDFT;                 // Reset Freq Domain Pointer
+    rad2FFT(N, DFT, x); // Calculate the forward FFT with variables switched (time & freq)
+
+    int i;
+    complex<Real_t>* x;
+    for ( i = 0, x = pX; i < N; i++, x++){
+        x->Re *= NN;    // Divide time domain by N for correct amplitude scaling
+        x->Im *= -1;    // Change the sign of ImX
+    }    
 }
 
 #endif

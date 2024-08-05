@@ -10,7 +10,7 @@ using namespace sw::universal;
 
 int main()
 {
-    using Real = posit<8,2>;
+    using Real_t = posit<8,2>;
     /* initialize random seed: */
     std::random_device rd{};
     std::mt19937 gen{rd()}; gen.seed(1);
@@ -43,8 +43,8 @@ int main()
     }
     std::cout << std::endl;
 
-    complex<Real> *x = new complex<Real>[Ls];
-    complex<Real> *DFT = new complex<Real>[Ls];
+    complex<Real_t> *x = new complex<Real_t>[Ls];
+    complex<Real_t> *DFT = new complex<Real_t>[Ls];
     for (int i = 0; i< Ls; ++i)
     {
         x[i].Re = f[i];
